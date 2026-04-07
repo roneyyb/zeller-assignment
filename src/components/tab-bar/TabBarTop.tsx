@@ -1,0 +1,149 @@
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { StyleProp, View, ViewStyle } from 'react-native';
+import PagerView, {
+  PagerViewOnPageSelectedEvent,
+} from 'react-native-pager-view';
+
+import SegmentedControl from '../segmented-control/SegmentedControl';
+
+type RenderPage = (option: string, index: number) => React.ReactNode;
+
+export type TopTabBarProps = {
+  /** Tab labels in pager order. Must be stable across renders. */
+  options: string[];
+
+  /**
+   * Controlled selected option (recommended when you also store current tab in state/store).
+   * If omitted, component is uncontrolled and uses `defaultOption`.
+   */
+  selectedOption?: string;
+
+  /** Initial option in uncontrolled mode. Defaults to first entry in `options`. */
+  defaultOption?: string;
+
+  /** Fired when user taps a segment or swipes pages. */
+  onOptionChange?: (option: string, index: number) => void;
+
+  /** Renders the page content for each option. */
+  renderPage: RenderPage;
+
+  /** Container styles. */
+  containerStyle?: StyleProp<ViewStyle>;
+
+  /** Segmented control styling passthrough. */
+  segmented?: Pick<
+    React.ComponentProps<typeof SegmentedControl>,
+    | 'activeColor'
+    | 'activeTextColor'
+    | 'inactiveTextColor'
+    | 'backgroundColor'
+    | 'activeTextSize'
+    | 'inactiveTextSize'
+    | 'height'
+    | 'internalPadding'
+    | 'borderRadius'
+    | 'paddingVertical'
+    | 'width'
+    | 'optionStyle'
+    | 'wrapperStyle'
+  >;
+
+  /** Pager props. */
+  pagerStyle?: StyleProp<ViewStyle>;
+  scrollEnabled?: boolean;
+};
+
+/**
+ * Top segmented tabs + swipeable pager.
+ *
+ * - Tap on a tab -> animates selector + scrolls pager
+ * - Swipe pager -> updates selected tab
+ */
+export default function TopTabBar({
+  options,
+  selectedOption: selectedOptionProp,
+  defaultOption,
+  onOptionChange,
+  renderPage,
+  containerStyle,
+  segmented,
+  pagerStyle,
+  scrollEnabled = true,
+}: TopTabBarProps) {
+  const pagerRef = useRef<PagerView>(null);
+
+  const fallbackDefault = useMemo(() => options[0] ?? '', [options]);
+  const uncontrolledDefault = defaultOption ?? fallbackDefault;
+
+  const isControlled = selectedOptionProp != null;
+  const [uncontrolledOption, setUncontrolledOption] =
+    useState(uncontrolledDefault);
+
+  const selectedOption = isControlled
+    ? (selectedOptionProp as string)
+    : uncontrolledOption;
+
+  const selectedIndex = useMemo(() => {
+    const idx = options.indexOf(selectedOption);
+    return idx >= 0 ? idx : 0;
+  }, [options, selectedOption]);
+
+  const setSelected = useCallback(
+    (nextOption: string, nextIndex: number, source: 'tap' | 'swipe') => {
+      if (!isControlled) setUncontrolledOption(nextOption);
+      onOptionChange?.(nextOption, nextIndex);
+
+      // Only imperatively move the pager when the source is a tap.
+      // On swipe, the pager is already at the right index.
+      if (source === 'tap') {
+        pagerRef.current?.setPage(nextIndex);
+      }
+    },
+    [isControlled, onOptionChange],
+  );
+
+  const handleOptionPress = useCallback(
+    (option: string) => {
+      const idx = options.indexOf(option);
+      setSelected(option, idx >= 0 ? idx : 0, 'tap');
+    },
+    [options, setSelected],
+  );
+
+  const handlePageSelected = useCallback(
+    (e: PagerViewOnPageSelectedEvent) => {
+      const idx = e.nativeEvent.position;
+      const option = options[idx] ?? options[0] ?? '';
+      if (!option) return;
+      setSelected(option, idx, 'swipe');
+    },
+    [options, setSelected],
+  );
+
+  return (
+    <View style={containerStyle}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+        <SegmentedControl
+          options={options}
+          selectedOption={options[selectedIndex] ?? selectedOption}
+          onOptionPress={handleOptionPress}
+          {...segmented}
+        />
+        
+      </View>
+      <PagerView
+        ref={pagerRef}
+        style={pagerStyle as ViewStyle}
+        initialPage={selectedIndex}
+        onPageSelected={handlePageSelected}
+        scrollEnabled={scrollEnabled}
+      >
+        {options.map((option, index) => (
+          <View key={option} style={{ flex: 1 }}>
+            {renderPage(option, index)}
+          </View>
+        ))}
+      </PagerView>
+    </View>
+  );
+}
