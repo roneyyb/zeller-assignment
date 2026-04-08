@@ -144,8 +144,8 @@ export default function SearchBarExpandWithButton({
   useEffect(() => {
     if (!open) return;
     if (!autoFocus) return;
-    const id = setTimeout(() => inputRef.current?.focus(), 10);
-    return () => clearTimeout(id);
+    const id = requestAnimationFrame(() => inputRef.current?.focus());
+    return () => cancelAnimationFrame(id);
   }, [autoFocus, open]);
 
   const handleClear = useCallback(() => {

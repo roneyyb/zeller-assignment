@@ -271,7 +271,6 @@ const SegmentedControl = ({
   const [optionLayouts, setOptionLayouts] = useState<
     Record<string, OptionLayout>
   >({});
-  const [containerWidth, setContainerWidth] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
   const selectorX = useSharedValue(0);
@@ -280,7 +279,7 @@ const SegmentedControl = ({
   useEffect(() => {
     if (!showIndicator) return;
     const selectedLayout = optionLayouts[selectedKey];
-    if (!selectedLayout || containerWidth <= 0) return;
+    if (!selectedLayout) return;
 
     setIsAnimating(true);
     const duration = animation?.duration ?? 300;
@@ -295,7 +294,6 @@ const SegmentedControl = ({
   }, [
     selectedKey,
     optionLayouts,
-    containerWidth,
     showIndicator,
     animation?.duration,
     selectorWidth,
@@ -323,10 +321,6 @@ const SegmentedControl = ({
     }));
   };
 
-  const handleContainerLayout = (event: LayoutChangeEvent) => {
-    setContainerWidth(event.nativeEvent.layout.width);
-  };
-
   const selectorAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: selectorX.value }],
     width: selectorWidth.value,
@@ -334,7 +328,6 @@ const SegmentedControl = ({
 
   return (
     <View
-      onLayout={handleContainerLayout}
       style={[
         {
           flexDirection: 'row',

@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { StyleProp, View, ViewStyle } from 'react-native';
 import PagerView, {
   PagerViewOnPageSelectedEvent,
@@ -136,24 +130,18 @@ export default function TopTabBar({
           justifyContent: 'space-between',
           alignItems: 'center',
           paddingHorizontal: 16,
-          flexWrap: 'wrap',
         }}
       >
-        <View
-          style={{
-            flex: hideHeaderLeft ? 0 : 0.8,
-            width: hideHeaderLeft ? 0 : '100%',
-            transform: [{ translateX: hideHeaderLeft ? -100 : 0 }],
-            opacity: hideHeaderLeft ? 0 : 1,
-          }}
-        >
-          <SegmentedControl
-            options={options}
-            selectedOption={options[selectedIndex] ?? selectedOption}
-            onOptionPress={handleOptionPress}
-            {...segmented}
-          />
-        </View>
+        {hideHeaderLeft ? null : (
+          <View style={{ flex: 1 }}>
+            <SegmentedControl
+              options={options}
+              selectedOption={options[selectedIndex] ?? selectedOption}
+              onOptionPress={handleOptionPress}
+              {...segmented}
+            />
+          </View>
+        )}
 
         <View
           style={{
