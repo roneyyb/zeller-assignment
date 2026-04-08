@@ -121,19 +121,25 @@ export default function TopTabBar({
   );
 
   return (
-    <View style={containerStyle}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+    <View style={[{ flex: 1 }, containerStyle]}>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexShrink: 0,
+        }}
+      >
         <SegmentedControl
           options={options}
           selectedOption={options[selectedIndex] ?? selectedOption}
           onOptionPress={handleOptionPress}
           {...segmented}
         />
-        
       </View>
       <PagerView
         ref={pagerRef}
-        style={pagerStyle as ViewStyle}
+        style={[pagerStyle, { flex: 1 }]}
         initialPage={selectedIndex}
         onPageSelected={handlePageSelected}
         scrollEnabled={scrollEnabled}

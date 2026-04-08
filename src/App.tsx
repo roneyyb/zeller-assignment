@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import SegmentedControl from './components/segmented-control/SegmentedControl';
 import TopTabBar from './components/tab-bar/TabBarTop';
 import AdminList from './features/AdminList';
 import { AppThemeProvider, useAppTheme } from './utils/theme';
 
 import SearchBarExpandWithButton from '@/src/components/search-bar/SearchBarExpandWithButton';
+
 export function HeaderSearch() {
   const [q, setQ] = useState('');
   return (
@@ -23,29 +23,39 @@ export function HeaderSearch() {
 
 function AppContent() {
   const { colors } = useAppTheme();
-  const [selectedOption, setSelectedOption] = useState('Option 1');
 
   return (
     <SafeAreaView
       style={[styles.safeArea, { backgroundColor: colors.background }]}
       edges={['top', 'left', 'right']}
     >
-      <SegmentedControl
-        options={['Option three', 'Option two', 'Option one']}
-        selectedOption={selectedOption}
-        onOptionPress={(option) => setSelectedOption(option)}
-      />
       <HeaderSearch />
       <TopTabBar
         options={['All', 'Admin', 'Manager']}
+        // selectedOption={selectedOption}
+        //  onOptionPress={(option) => setSelectedOption(option)}
         renderPage={(option) => {
+          console.log('option', option);
           switch (option) {
             case 'Admin':
-              return <AdminList />;
+              return (
+                <View style={{ flex: 1 }}>
+                  <AdminList role="Admin" />
+                </View>
+              );
+
             case 'Manager':
-              return <Text>Manager List</Text>;
+              return (
+                <View style={{ flex: 1 }}>
+                  <AdminList role="Manager" />
+                </View>
+              );
             default:
-              return <Text>All List</Text>;
+              return (
+                <View style={{ flex: 1 }}>
+                  <AdminList role="" />
+                </View>
+              );
           }
         }}
       />
