@@ -41,4 +41,58 @@ describe('createUseUsers', () => {
     expect(syncFromNetwork).toHaveBeenCalledTimes(1);
     expect(listFromDb).toHaveBeenCalled();
   });
+
+  it('refresh sets error when sync fails', async () => {
+    const listFromDb = jest.fn().mockResolvedValue([]);
+    const syncFromNetwork = jest
+      .fn()
+      .mockRejectedValue(new Error('Network unavailable'));
+    const useTestUsers = createUseUsers({ listFromDb, syncFromNetwork });
+    const { result } = renderHook(() => useTestUsers({}));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await act(async () => {
+      await result.current.refresh();
+    });
+
+    expect(result.current.error).toBe('Network unavailable');
+    expect(result.current.refreshing).toBe(false);
+  });
+
+  it('refresh sets generic error when sync rejects non-Error', async () => {
+    const listFromDb = jest.fn().mockResolvedValue([]);
+    const syncFromNetwork = jest.fn().mockRejectedValue('boom');
+    const useTestUsers = createUseUsers({ listFromDb, syncFromNetwork });
+    const { result } = renderHook(() => useTestUsers({}));
+
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await act(async () => {
+      await result.current.refresh();
+    });
+
+    expect(result.current.error).toBe('Failed to refresh users');
+  });
+
+  it('reloads from db when search param changes', async () => {
+    const listFromDb = jest.fn().mockResolvedValue([]);
+    const syncFromNetwork = jest.fn();
+    const useTestUsers = createUseUsers({ listFromDb, syncFromNetwork });
+
+    const { rerender } = renderHook(
+      ({ search }: { search: string }) => useTestUsers({ search }),
+      { initialProps: { search: 'a' } },
+    );
+
+    await waitFor(() => expect(listFromDb).toHaveBeenCalled());
+    expect(listFromDb).toHaveBeenCalledWith({ role: null, search: 'a' });
+
+    listFromDb.mockClear();
+    rerender({ search: 'b' });
+
+    await waitFor(() =>
+      expect(listFromDb).toHaveBeenCalledWith({ role: null, search: 'b' }),
+    );
+  });
 });

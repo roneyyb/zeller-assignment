@@ -27,4 +27,10 @@ describe('buildListUsersQuery', () => {
     expect(sql).toContain('AND');
     expect(args).toEqual(['MANAGER', '%@%']);
   });
+
+  it('ignores blank search and role', () => {
+    const { sql, args } = buildListUsersQuery({ role: '   ', search: '  ' });
+    expect(sql).not.toContain('WHERE');
+    expect(args).toEqual([]);
+  });
 });

@@ -14,6 +14,7 @@ import {
 } from '@/src/domain/createUserForm';
 import { createLocalId } from '@/src/utils/id';
 import { useAppTheme } from '@/src/utils/theme';
+import { MaterialIcons } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Controller, useForm } from 'react-hook-form';
@@ -29,6 +30,17 @@ export type CreateUserDeps = {
   }) => Promise<void>;
   onCreated: () => void;
 };
+
+function capitalizeFirstLetter(value: string) {
+  if (!value) return value;
+  const trimmedStart = value.replace(/^\s+/, '');
+  if (!trimmedStart) return value;
+  const firstCharIndex = value.length - trimmedStart.length;
+  const first = value[firstCharIndex] ?? '';
+  const upper = first.toUpperCase();
+  if (first === upper) return value;
+  return value.slice(0, firstCharIndex) + upper + value.slice(firstCharIndex + 1);
+}
 
 export function CreateUserScreenBase({ deps }: { deps: CreateUserDeps }) {
   const { colors } = useAppTheme();
@@ -88,7 +100,7 @@ export function CreateUserScreenBase({ deps }: { deps: CreateUserDeps }) {
             hitSlop={12}
             style={styles.closeButton}
           >
-            <Text style={[styles.closeX, { color: colors.primary }]}>×</Text>
+            <MaterialIcons name="close" size={24} color={colors.primary} />
           </Pressable>
         </View>
 
@@ -101,13 +113,17 @@ export function CreateUserScreenBase({ deps }: { deps: CreateUserDeps }) {
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
                 value={value}
-                onChangeText={onChange}
+                onChangeText={(t) => onChange(capitalizeFirstLetter(t))}
                 onBlur={onBlur}
                 placeholder="First Name"
                 placeholderTextColor={colors.textMuted}
+                autoCapitalize="words"
                 style={[
                   styles.input,
-                  { color: colors.text, borderColor: colors.border },
+                  {
+                    color: colors.text,
+                    borderColor: errors.firstName ? colors.error : colors.border,
+                  },
                 ]}
               />
             )}
@@ -126,13 +142,17 @@ export function CreateUserScreenBase({ deps }: { deps: CreateUserDeps }) {
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
                 value={value}
-                onChangeText={onChange}
+                onChangeText={(t) => onChange(capitalizeFirstLetter(t))}
                 onBlur={onBlur}
                 placeholder="Last Name"
                 placeholderTextColor={colors.textMuted}
+                autoCapitalize="words"
                 style={[
                   styles.input,
-                  { color: colors.text, borderColor: colors.border },
+                  {
+                    color: colors.text,
+                    borderColor: errors.lastName ? colors.error : colors.border,
+                  },
                 ]}
               />
             )}
@@ -151,7 +171,7 @@ export function CreateUserScreenBase({ deps }: { deps: CreateUserDeps }) {
             render={({ field: { onChange, onBlur, value } }) => (
               <TextInput
                 value={value}
-                onChangeText={onChange}
+                onChangeText={(t) => onChange(t.trimStart())}
                 onBlur={onBlur}
                 placeholder="Email"
                 placeholderTextColor={colors.textMuted}
@@ -159,7 +179,10 @@ export function CreateUserScreenBase({ deps }: { deps: CreateUserDeps }) {
                 keyboardType="email-address"
                 style={[
                   styles.input,
-                  { color: colors.text, borderColor: colors.border },
+                  {
+                    color: colors.text,
+                    borderColor: errors.email ? colors.error : colors.border,
+                  },
                 ]}
               />
             )}

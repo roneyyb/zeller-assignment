@@ -67,11 +67,11 @@ export default function UsersHome() {
           activeTextColor: colors.primary,
           inactiveTextColor: colors.textSecondary,
           borderRadius: 100,
-          height: 44,
+          height: 50,
           indicatorBorderRadius: 100,
           paddingVertical: 0,
           optionStyle: {
-            paddingHorizontal: '20%',
+            paddingHorizontal: '15%',
           },
           indicatorStyle: {
             backgroundColor: colors.primary + '1A',

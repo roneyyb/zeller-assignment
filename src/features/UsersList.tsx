@@ -87,6 +87,7 @@ export default function UsersList({
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={refresh} />
       }
+      showsVerticalScrollIndicator={false}
       contentContainerStyle={{ paddingBottom: 120 }}
       ListHeaderComponent={
         error ? (

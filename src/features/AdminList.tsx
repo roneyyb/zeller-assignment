@@ -53,6 +53,7 @@ const AdminList = ({
           No users match this filter. Pull to refresh to sync from the API.
         </Text>
       }
+      
       ListHeaderComponent={
         error ? (
           <Text style={{ color: colors.error, marginBottom: 8 }}>{error}</Text>
