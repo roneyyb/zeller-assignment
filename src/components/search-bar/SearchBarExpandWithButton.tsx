@@ -28,7 +28,7 @@ import Animated, {
 
 export type SearchBarExpandWithButtonProps = {
   /** Controlled input value. */
-  value: string;
+  value?: string;
   /** Controlled input change handler. */
   onChangeText: (text: string) => void;
 
@@ -94,6 +94,7 @@ export default function SearchBarExpandWithButton({
   inputProps,
 }: SearchBarExpandWithButtonProps) {
   const { colors } = useAppTheme();
+  const safeValue = value ?? '';
   const inputRef = useRef<TextInput>(null);
 
   const [containerWidth, setContainerWidth] = useState(0);
@@ -172,7 +173,12 @@ export default function SearchBarExpandWithButton({
 
   const iconAnimatedStyle = useAnimatedStyle(() => {
     const opacity = interpolate(progress.value, [0, 0.6, 1], [1, 0, 0]);
-    return { opacity };
+    const width = interpolate(
+      progress.value,
+      [0, 0.6, 1],
+      [collapsedWidth, 0, 0],
+    );
+    return { opacity, width };
   });
 
   const closeAnimatedStyle = useAnimatedStyle(() => {
@@ -220,7 +226,7 @@ export default function SearchBarExpandWithButton({
 
           <TextInput
             ref={inputRef}
-            value={value}
+            value={safeValue}
             onChangeText={onChangeText}
             placeholder={placeholder}
             placeholderTextColor={colors.textMuted}
@@ -240,13 +246,17 @@ export default function SearchBarExpandWithButton({
 
           <Pressable
             onPress={handleClear}
-            disabled={disabled || value.length === 0}
+            disabled={disabled || safeValue.length === 0}
             hitSlop={10}
             style={({ pressed }) => [
               styles.clearButton,
               {
                 opacity:
-                  disabled || value.length === 0 ? 0.35 : pressed ? 0.65 : 1,
+                  disabled || safeValue.length === 0
+                    ? 0.35
+                    : pressed
+                      ? 0.65
+                      : 1,
               },
             ]}
           >

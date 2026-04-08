@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useMemo } from 'react';
 import { useColorScheme } from 'react-native';
 
-import { darkPalette, lightPalette, type ColorPalette } from './palette';
+import { lightPalette, type ColorPalette } from './palette';
 
 export type AppColorScheme = 'light' | 'dark';
 
@@ -19,14 +19,18 @@ export function AppThemeProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<AppTheme>(
     () => ({
-      colors: scheme === 'dark' ? darkPalette : lightPalette,
+      colors: lightPalette,
       scheme,
       isDark: scheme === 'dark',
     }),
     [scheme],
   );
 
-  return <AppThemeContext.Provider value={value}>{children}</AppThemeContext.Provider>;
+  return (
+    <AppThemeContext.Provider value={value}>
+      {children}
+    </AppThemeContext.Provider>
+  );
 }
 
 export function useAppTheme(): AppTheme {

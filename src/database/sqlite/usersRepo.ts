@@ -42,3 +42,24 @@ export async function listUsers(query: UserQuery = {}): Promise<UserRow[]> {
   const { sql, args } = buildListUsersQuery(query);
   return (await db.getAllAsync(sql, args)) as UserRow[];
 }
+
+export async function createUser(input: {
+  id: string;
+  name: string;
+  email: string | null;
+  role: string;
+  now?: number;
+}) {
+  const now = input.now ?? Date.now();
+  return upsertUsers(
+    [
+      {
+        id: input.id,
+        name: input.name,
+        email: input.email,
+        role: input.role,
+      },
+    ],
+    now,
+  );
+}

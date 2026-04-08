@@ -18,9 +18,10 @@ export function buildListUsersQuery(query: UserQuery = {}): BuiltUserListQuery {
   }
 
   if (query.search?.trim()) {
-    where.push(`(name LIKE ? OR email LIKE ?)`);
+    // Requirement: text search to filter users by name.
+    where.push(`name LIKE ?`);
     const like = `%${query.search.trim()}%`;
-    args.push(like, like);
+    args.push(like);
   }
 
   const sql = `

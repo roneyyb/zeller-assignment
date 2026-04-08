@@ -1,10 +1,18 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { StyleProp, View, ViewStyle } from 'react-native';
 import PagerView, {
   PagerViewOnPageSelectedEvent,
 } from 'react-native-pager-view';
 
-import SegmentedControl from '../segmented-control/SegmentedControl';
+import SegmentedControl, {
+  SegmentedControlProps,
+} from '../segmented-control/SegmentedControl';
 
 type RenderPage = (option: string, index: number) => React.ReactNode;
 
@@ -30,23 +38,14 @@ export type TopTabBarProps = {
   /** Container styles. */
   containerStyle?: StyleProp<ViewStyle>;
 
+  /** Optional right-side content next to the segmented control (e.g. search icon). */
+  headerRight?: React.ReactNode;
+
+  /** Hide the segmented control (left header) while keeping pager. */
+  hideHeaderLeft?: boolean;
+
   /** Segmented control styling passthrough. */
-  segmented?: Pick<
-    React.ComponentProps<typeof SegmentedControl>,
-    | 'activeColor'
-    | 'activeTextColor'
-    | 'inactiveTextColor'
-    | 'backgroundColor'
-    | 'activeTextSize'
-    | 'inactiveTextSize'
-    | 'height'
-    | 'internalPadding'
-    | 'borderRadius'
-    | 'paddingVertical'
-    | 'width'
-    | 'optionStyle'
-    | 'wrapperStyle'
-  >;
+  segmented?: Partial<SegmentedControlProps>;
 
   /** Pager props. */
   pagerStyle?: StyleProp<ViewStyle>;
@@ -66,6 +65,8 @@ export default function TopTabBar({
   onOptionChange,
   renderPage,
   containerStyle,
+  headerRight,
+  hideHeaderLeft = false,
   segmented,
   pagerStyle,
   scrollEnabled = true,
@@ -87,6 +88,13 @@ export default function TopTabBar({
     const idx = options.indexOf(selectedOption);
     return idx >= 0 ? idx : 0;
   }, [options, selectedOption]);
+
+  useEffect(() => {
+    // When controlled, the parent may change `selectedOption` programmatically
+    // (e.g. forcing "All" when search opens). Keep the pager in sync.
+    if (!isControlled) return;
+    pagerRef.current?.setPage(selectedIndex);
+  }, [isControlled, selectedIndex]);
 
   const setSelected = useCallback(
     (nextOption: string, nextIndex: number, source: 'tap' | 'swipe') => {
@@ -127,15 +135,35 @@ export default function TopTabBar({
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          flexShrink: 0,
+          paddingHorizontal: 16,
+          flexWrap: 'wrap',
         }}
       >
-        <SegmentedControl
-          options={options}
-          selectedOption={options[selectedIndex] ?? selectedOption}
-          onOptionPress={handleOptionPress}
-          {...segmented}
-        />
+        <View
+          style={{
+            flex: hideHeaderLeft ? 0 : 0.8,
+            width: hideHeaderLeft ? 0 : '100%',
+            transform: [{ translateX: hideHeaderLeft ? -100 : 0 }],
+            opacity: hideHeaderLeft ? 0 : 1,
+          }}
+        >
+          <SegmentedControl
+            options={options}
+            selectedOption={options[selectedIndex] ?? selectedOption}
+            onOptionPress={handleOptionPress}
+            {...segmented}
+          />
+        </View>
+
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'flex-end',
+          }}
+        >
+          {headerRight}
+        </View>
       </View>
       <PagerView
         ref={pagerRef}

@@ -30,7 +30,9 @@ import AdminList from './AdminList';
 
 describe('AdminList', () => {
   it('renders user from mocked hook without initial sync', async () => {
-    renderWithProviders(<AdminList role="Admin" initialSync={false} />);
+    renderWithProviders(
+      <AdminList role="Admin" search="Ada" initialSync={false} />,
+    );
 
     await waitFor(() => {
       expect(screen.getByText('Test User')).toBeTruthy();

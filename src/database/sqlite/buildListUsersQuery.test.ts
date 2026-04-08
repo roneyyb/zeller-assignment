@@ -15,16 +15,16 @@ describe('buildListUsersQuery', () => {
     expect(args).toEqual(['ADMIN']);
   });
 
-  it('adds search on name and email', () => {
+  it('adds search on name', () => {
     const { sql, args } = buildListUsersQuery({ search: 'lee' });
     expect(sql).toContain('name LIKE ?');
-    expect(sql).toContain('email LIKE ?');
-    expect(args).toEqual(['%lee%', '%lee%']);
+    expect(sql).not.toContain('email LIKE ?');
+    expect(args).toEqual(['%lee%']);
   });
 
   it('combines role and search with AND', () => {
     const { sql, args } = buildListUsersQuery({ role: 'Manager', search: '@' });
     expect(sql).toContain('AND');
-    expect(args).toEqual(['MANAGER', '%@%', '%@%']);
+    expect(args).toEqual(['MANAGER', '%@%']);
   });
 });

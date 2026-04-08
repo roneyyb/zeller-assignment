@@ -16,15 +16,18 @@ export type ColorPalette = {
 };
 
 export const lightPalette: ColorPalette = {
+  // Extracted from design reference screenshot (approx).
   background: '#ffffff',
-  surface: '#f4f4f5',
-  surfaceElevated: '#e4e4e7',
-  text: '#11181c',
-  textSecondary: '#3f3f46',
-  textMuted: '#71717a',
-  primary: '#0a7ea4',
+  // Used for segmented controls / subtle panels
+  surface: '#f3f4f6',
+  // Used for cards / list rows
+  surfaceElevated: '#ffffff',
+  text: '#111827',
+  textSecondary: '#6b7280',
+  textMuted: '#4d5151',
+  primary: '#0b67b2',
   onPrimary: '#ffffff',
-  border: '#e4e4e7',
+  border: '#e5e7eb',
   error: '#dc2626',
   success: '#16a34a',
 };

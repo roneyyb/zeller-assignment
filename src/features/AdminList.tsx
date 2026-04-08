@@ -12,14 +12,20 @@ import { useUsers } from './useUsers';
 
 type AdminListProps = {
   role?: string;
+  search?: string;
   /** When true, syncs from the network on mount. Disable in tests. @default true */
   initialSync?: boolean;
 };
 
-const AdminList = ({ role = 'Admin', initialSync = true }: AdminListProps) => {
+const AdminList = ({
+  role = 'Admin',
+  search = '',
+  initialSync = true,
+}: AdminListProps) => {
   const { colors } = useAppTheme();
   const { rows, loading, refreshing, error, refresh } = useUsers({
     role: role || null,
+    search,
   });
 
   useEffect(() => {

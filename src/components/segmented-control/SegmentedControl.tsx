@@ -3,15 +3,17 @@ import {
   LayoutChangeEvent,
   Pressable,
   StyleProp,
-  Text,
   View,
   ViewStyle,
 } from 'react-native';
 
 import Animated, {
+  interpolateColor,
   runOnJS,
   useAnimatedStyle,
+  useDerivedValue,
   useSharedValue,
+  type SharedValue,
   withTiming,
 } from 'react-native-reanimated';
 
@@ -120,6 +122,80 @@ type OptionLayout = {
   width: number;
 };
 
+type SegmentedOptionLabelProps = {
+  label: string;
+  fontSize: number;
+  fontFamily?: string;
+  textStyle?: any;
+  activeTextStyle?: any;
+  inactiveTextStyle?: any;
+  disabledTextStyle?: any;
+  disabled: boolean;
+  isActive: boolean;
+  activeTextColor: string;
+  inactiveTextColor: string;
+  disabledTextColor?: string;
+  // Animation inputs (shared across all options)
+  selectorX: SharedValue<number>;
+  selectorWidth: SharedValue<number>;
+  layout?: OptionLayout;
+};
+
+function SegmentedOptionLabel({
+  label,
+  fontSize,
+  fontFamily,
+  textStyle,
+  activeTextStyle,
+  inactiveTextStyle,
+  disabledTextStyle,
+  disabled,
+  isActive,
+  activeTextColor,
+  inactiveTextColor,
+  disabledTextColor,
+  selectorX,
+  selectorWidth,
+  layout,
+}: SegmentedOptionLabelProps) {
+  const t = useDerivedValue(() => {
+    if (!layout) return isActive ? 1 : 0;
+    const optionCenter = layout.x + layout.width / 2;
+    const selectorCenter = selectorX.value + selectorWidth.value / 2;
+    const d = Math.abs(selectorCenter - optionCenter);
+    const half = Math.max(1, layout.width / 2);
+    const v = 1 - d / half;
+    return Math.max(0, Math.min(1, v));
+  }, [isActive, layout, selectorWidth, selectorX]);
+
+  const animatedTextStyle = useAnimatedStyle(() => {
+    if (disabled) {
+      return {
+        color: disabledTextColor ?? inactiveTextColor,
+      };
+    }
+
+    return {
+      color: interpolateColor(t.value, [0, 1], [inactiveTextColor, activeTextColor]),
+    };
+  }, [activeTextColor, disabled, disabledTextColor, inactiveTextColor, t]);
+
+  return (
+    <Animated.Text
+      style={[
+        { fontSize },
+        fontFamily ? { fontFamily } : null,
+        textStyle,
+        isActive ? activeTextStyle : inactiveTextStyle,
+        disabled ? disabledTextStyle : null,
+        animatedTextStyle,
+      ]}
+    >
+      {label + ' '}
+    </Animated.Text>
+  );
+}
+
 const SegmentedControl = ({
   options,
   selectedOption,
@@ -186,11 +262,15 @@ const SegmentedControl = ({
   const selectedKey = useMemo(() => {
     // Allow passing label as convenience (keeps old API working)
     if (optionByKey.has(selectedOption)) return selectedOption;
-    const matchByLabel = normalizedOptions.find((o) => o.label === selectedOption);
+    const matchByLabel = normalizedOptions.find(
+      (o) => o.label === selectedOption,
+    );
     return matchByLabel?.key ?? normalizedOptions[0]?.key ?? '';
   }, [normalizedOptions, optionByKey, selectedOption]);
 
-  const [optionLayouts, setOptionLayouts] = useState<Record<string, OptionLayout>>({});
+  const [optionLayouts, setOptionLayouts] = useState<
+    Record<string, OptionLayout>
+  >({});
   const [containerWidth, setContainerWidth] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -252,21 +332,16 @@ const SegmentedControl = ({
     width: selectorWidth.value,
   }));
 
-  const resolvedIndicatorColor = indicatorColor ?? activeColor;
-  const resolvedIndicatorBorderColor = indicatorBorderColor ?? activeColor;
-  const resolvedDisabledTextColor = disabledTextColor ?? inactiveTextColor;
-
   return (
     <View
       onLayout={handleContainerLayout}
-      accessibilityLabel={accessibilityLabel}
       style={[
         {
           flexDirection: 'row',
           height,
           backgroundColor,
           borderRadius,
-          paddingHorizontal: internalPadding / 2,
+          // paddingHorizontal: internalPadding / 2,
           paddingVertical,
           width,
           position: 'relative',
@@ -284,8 +359,8 @@ const SegmentedControl = ({
               bottom: indicatorInset,
               borderRadius: indicatorBorderRadius,
               borderWidth: indicatorBorderWidth,
-              borderColor: resolvedIndicatorBorderColor,
-              backgroundColor: resolvedIndicatorColor,
+              borderColor: indicatorBorderColor,
+              backgroundColor: indicatorColor,
               shadowColor: 'black',
               shadowOffset: { width: 0, height: 0 },
               shadowOpacity: 0.1,
@@ -299,6 +374,7 @@ const SegmentedControl = ({
       {normalizedOptions.map((opt) => {
         const isActive = opt.key === selectedKey;
         const isOptionDisabled = disabled || opt.disabled;
+        const layout = optionLayouts[opt.key];
 
         return (
           <Pressable
@@ -308,7 +384,10 @@ const SegmentedControl = ({
             testID={opt.testID}
             accessibilityLabel={opt.accessibilityLabel}
             accessibilityRole="button"
-            accessibilityState={{ selected: isActive, disabled: isOptionDisabled }}
+            accessibilityState={{
+              selected: isActive,
+              disabled: isOptionDisabled,
+            }}
             onLayout={(event) => handleOptionLayout(opt.key, event)}
             style={[
               {
@@ -317,7 +396,12 @@ const SegmentedControl = ({
                 paddingHorizontal: 10,
                 ...(equalWidthOptions ? { flex: 1 } : null),
                 ...(optionGap && !equalWidthOptions
-                  ? { marginRight: opt.index === normalizedOptions.length - 1 ? 0 : optionGap }
+                  ? {
+                      marginRight:
+                        opt.index === normalizedOptions.length - 1
+                          ? 0
+                          : optionGap,
+                    }
                   : null),
               },
               optionStyle,
@@ -334,24 +418,23 @@ const SegmentedControl = ({
                 disabled: isOptionDisabled,
               })
             ) : (
-              <Text
-                style={[
-                  { fontSize: isActive ? activeTextSize : inactiveTextSize },
-                  {
-                    color: isOptionDisabled
-                      ? resolvedDisabledTextColor
-                      : isActive
-                        ? activeTextColor
-                        : inactiveTextColor,
-                  },
-                  fontFamily ? { fontFamily } : null,
-                  textStyle,
-                  isActive ? activeTextStyle : inactiveTextStyle,
-                  isOptionDisabled ? disabledTextStyle : null,
-                ]}
-              >
-                {opt.label}
-              </Text>
+              <SegmentedOptionLabel
+                label={opt.label}
+                fontSize={isActive ? activeTextSize : inactiveTextSize}
+                fontFamily={fontFamily}
+                textStyle={textStyle}
+                activeTextStyle={activeTextStyle}
+                inactiveTextStyle={inactiveTextStyle}
+                disabledTextStyle={disabledTextStyle}
+                disabled={isOptionDisabled}
+                isActive={isActive}
+                activeTextColor={activeTextColor}
+                inactiveTextColor={inactiveTextColor}
+                disabledTextColor={disabledTextColor}
+                selectorX={selectorX}
+                selectorWidth={selectorWidth}
+                layout={layout}
+              />
             )}
           </Pressable>
         );
