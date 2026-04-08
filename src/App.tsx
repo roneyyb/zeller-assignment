@@ -35,7 +35,6 @@ function AppContent() {
         // selectedOption={selectedOption}
         //  onOptionPress={(option) => setSelectedOption(option)}
         renderPage={(option) => {
-          console.log('option', option);
           switch (option) {
             case 'Admin':
               return (

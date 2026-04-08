@@ -3,6 +3,12 @@ import * as SQLite from 'expo-sqlite';
 let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
 let migratePromise: Promise<void> | null = null;
 
+/** Test helper: clear singletons so the next `getDb()` opens a fresh handle. */
+export function resetSqliteForTests(): void {
+  dbPromise = null;
+  migratePromise = null;
+}
+
 export async function getDb() {
   if (!dbPromise) {
     dbPromise = SQLite.openDatabaseAsync('users.db');

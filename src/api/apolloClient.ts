@@ -5,6 +5,11 @@ import { getAppSyncConfig } from '../config/appsync';
 
 let client: ApolloClient | null = null;
 
+/** Test helper: force a new Apollo client (e.g. after env/mocks change). */
+export function resetApolloClientForTests(): void {
+  client = null;
+}
+
 export function getApolloClient() {
   if (client) return client;
 

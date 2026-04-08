@@ -10,18 +10,23 @@ import {
 import { useAppTheme } from '@/src/utils/theme';
 import { useUsers } from './useUsers';
 
-const AdminList = ({ role = 'Admin' }: { role?: string }) => {
-  console.log('role', role);
+type AdminListProps = {
+  role?: string;
+  /** When true, syncs from the network on mount. Disable in tests. @default true */
+  initialSync?: boolean;
+};
+
+const AdminList = ({ role = 'Admin', initialSync = true }: AdminListProps) => {
   const { colors } = useAppTheme();
   const { rows, loading, refreshing, error, refresh } = useUsers({
-    role,
+    role: role || null,
   });
 
-  // First load: sync from network then read from SQLite (`refresh` does both).
   useEffect(() => {
+    if (!initialSync) return;
     refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initialSync]);
 
   if (loading && rows.length === 0) {
     return (
@@ -35,13 +40,11 @@ const AdminList = ({ role = 'Admin' }: { role?: string }) => {
     <FlatList
       data={rows}
       keyExtractor={(item) => item.id}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={refresh} />
-      }
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
       contentContainerStyle={{ padding: 16, gap: 10 }}
       ListEmptyComponent={
         <Text style={{ color: colors.textMuted }}>
-          No admins yet. Pull to refresh to sync from AppSync.
+          No users match this filter. Pull to refresh to sync from the API.
         </Text>
       }
       ListHeaderComponent={

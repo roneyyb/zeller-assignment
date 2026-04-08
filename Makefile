@@ -39,7 +39,7 @@ help:
 	@echo "  make lint            - expo lint"
 	@echo "  make type-check      - tsc --noEmit"
 	@echo "  make check           - lint + type-check"
-	@echo "  make test            - bun test (if you add tests)"
+	@echo "  make test            - Jest (bun run test)"
 	@echo ""
 	@echo "🧹 Maintenance"
 	@echo "  make clean           - remove node_modules, native build dirs, .expo"
@@ -200,8 +200,7 @@ typecheck: type-check
 check: lint type-check
 
 test:
-	@TESTS=$$(find . -type d \( -name node_modules -o -name .git \) -prune -o -type f \( -name '*.test.*' -o -name '*_test_*' -o -name '*.spec.*' -o -name '*_spec_*' \) -print); \
-	if [ -n "$$TESTS" ]; then $(BUN) test; else echo "ℹ️  No test files found — skipping bun test"; fi
+	@$(BUN) run test
 
 simulator-list:
 	@xcrun simctl list devices
