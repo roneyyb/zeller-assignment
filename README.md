@@ -61,6 +61,44 @@ yarn test
 bun run test
 ```
 
+Run the full Jest suite serially if you want output closer to CI/debug sessions:
+
+```bash
+yarn test --runInBand
+```
+
+### Integration tests
+
+The suite includes integration-style tests for the most important user flows, in addition to unit tests for hooks, domain logic, API helpers, and SQLite helpers.
+
+- `src/screens/UsersHomeScreen.test.tsx`
+  - add-user navigation from the home screen
+  - row press -> edit-user navigation
+  - search opening forces the `All` tab and hides the segmented tabs
+  - returning focus triggers list reload behavior
+- `src/screens/CreateUserScreen.route.test.tsx`
+  - verifies `CreateUser` route uses create mode
+  - verifies `EditUser` route uses edit mode
+  - verifies route wrapper wiring to `getUserById`, `updateUser`, and `deleteUser`
+- `src/screens/UpsertUserScreenBase.test.tsx`
+  - edit-mode form prefill
+  - save/update flow
+  - delete flow
+
+Run only the integration-style screen tests:
+
+```bash
+yarn test src/screens/UsersHomeScreen.test.tsx --runInBand
+yarn test src/screens/CreateUserScreen.route.test.tsx --runInBand
+yarn test src/screens/UpsertUserScreenBase.test.tsx --runInBand
+```
+
+Or run all screen tests together:
+
+```bash
+yarn test src/screens --runInBand
+```
+
 ## Project notes
 
 ### Offline-first data flow
