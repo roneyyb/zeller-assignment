@@ -1,4 +1,4 @@
-/* eslint-disable import/first -- jest.mock needs to run before imports */
+/* eslint-disable import/first, @typescript-eslint/no-require-imports -- jest.mock needs to run before imports */
 const mockSetPage = jest.fn();
 
 jest.mock('react-native-pager-view', () => {

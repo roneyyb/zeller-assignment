@@ -22,18 +22,13 @@ jest.mock('@/src/utils/id', () => ({
   createLocalId: () => mockCreateLocalId(),
 }));
 
-jest.mock('@/src/screens/UpsertUserScreenBase', () => {
-  const React = require('react');
-  return {
-    __esModule: true,
-    default: ({ deps }: any) => {
-      latestUpsertDeps = deps;
-      return null;
-    },
-  };
-});
-
-import React from 'react';
+jest.mock('@/src/screens/UpsertUserScreenBase', () => ({
+  __esModule: true,
+  default: ({ deps }: any) => {
+    latestUpsertDeps = deps;
+    return null;
+  },
+}));
 
 import { renderWithProviders } from '@/src/test/renderWithProviders';
 
