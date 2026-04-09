@@ -1,5 +1,5 @@
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -30,8 +30,13 @@ export default function UsersHomeScreen() {
   });
 
   const [reloadKey, setReloadKey] = useState(0);
+  const didFocusOnce = useRef(false);
   useFocusEffect(
     useCallback(() => {
+      if (!didFocusOnce.current) {
+        didFocusOnce.current = true;
+        return;
+      }
       setReloadKey((k) => k + 1);
     }, []),
   );
@@ -140,4 +145,3 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-
