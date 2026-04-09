@@ -96,7 +96,7 @@ describe('CreateUserScreenBase', () => {
     ).toBeTruthy();
   });
 
-  it('submit stays disabled until all fields valid', async () => {
+  it('submit stays disabled until required fields valid', async () => {
     const createUser = jest.fn().mockResolvedValue(undefined);
 
     renderWithProviders(
@@ -116,10 +116,6 @@ describe('CreateUserScreenBase', () => {
     expect(btn.props.accessibilityState?.disabled).toBe(true);
 
     fireEvent.changeText(screen.getByPlaceholderText('Last Name'), 'Lovelace');
-    fireEvent.changeText(
-      screen.getByPlaceholderText('Email'),
-      'ada@example.com',
-    );
     await act(async () => {});
 
     expect(screen.getByTestId('create-user-submit').props.accessibilityState?.disabled).toBe(

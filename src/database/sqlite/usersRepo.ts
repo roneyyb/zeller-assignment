@@ -63,3 +63,42 @@ export async function createUser(input: {
     now,
   );
 }
+
+export async function getUserById(id: string): Promise<UserRow | null> {
+  const db = await getDb();
+  const rows = (await db.getAllAsync(
+    `SELECT id, name, email, role, updated_at FROM users WHERE id = ? LIMIT 1`,
+    [id],
+  )) as UserRow[];
+  return rows[0] ?? null;
+}
+
+export async function updateUser(input: {
+  id: string;
+  name: string;
+  email: string | null;
+  role: string;
+  now?: number;
+}): Promise<void> {
+  await upsertUsers(
+    [
+      {
+        id: input.id,
+        name: input.name,
+        email: input.email,
+        role: input.role,
+      },
+    ],
+    input.now ?? Date.now(),
+  );
+}
+
+export async function deleteUser(id: string): Promise<void> {
+  writeChain = writeChain.then(async () => {
+    const db = await getDb();
+    await db.withTransactionAsync(async () => {
+      await db.runAsync(`DELETE FROM users WHERE id = ?`, [id]);
+    });
+  });
+  return writeChain;
+}

@@ -3,7 +3,7 @@ jest.mock('./useUsers', () => ({
   useUsers: jest.fn(),
 }));
 
-import { screen, waitFor } from '@testing-library/react-native';
+import { fireEvent, screen, waitFor } from '@testing-library/react-native';
 import React from 'react';
 import { ActivityIndicator } from 'react-native';
 
@@ -102,6 +102,35 @@ describe('UsersList', () => {
     expect(screen.getByText('Manager')).toBeTruthy();
   });
 
+  it('calls onUserPress when a row is pressed', async () => {
+    mockedUseUsers.mockReturnValue({
+      rows: [
+        {
+          id: '1',
+          name: 'Ada',
+          email: null,
+          role: 'ADMIN',
+          updated_at: 1,
+        },
+      ],
+      loading: false,
+      refreshing: false,
+      error: null,
+      refresh: jest.fn(),
+      reloadFromDb: jest.fn(),
+    });
+
+    const onUserPress = jest.fn();
+    renderWithProviders(
+      <UsersList initialSync={false} onUserPress={onUserPress} />,
+    );
+
+    await waitFor(() => expect(screen.getByText('Ada')).toBeTruthy());
+    fireEvent.press(screen.getByTestId('user-row-1'));
+
+    expect(onUserPress).toHaveBeenCalledWith('1');
+  });
+
   it('passes role and search to useUsers', () => {
     mockedUseUsers.mockReturnValue({
       rows: [],
@@ -120,5 +149,27 @@ describe('UsersList', () => {
       role: 'Admin',
       search: 'lee',
     });
+  });
+
+  it('reloads from db when reloadKey changes', () => {
+    const reloadFromDb = jest.fn();
+    mockedUseUsers.mockReturnValue({
+      rows: [],
+      loading: false,
+      refreshing: false,
+      error: null,
+      refresh: jest.fn(),
+      reloadFromDb,
+    });
+
+    const { rerender } = renderWithProviders(
+      <UsersList initialSync={false} reloadKey={1} />,
+    );
+
+    expect(reloadFromDb).toHaveBeenCalled();
+    reloadFromDb.mockClear();
+
+    rerender(<UsersList initialSync={false} reloadKey={2} />);
+    expect(reloadFromDb).toHaveBeenCalled();
   });
 });

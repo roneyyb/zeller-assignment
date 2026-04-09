@@ -11,18 +11,26 @@ const requiredNamePart = z
   .regex(/^[A-Za-z ]+$/, 'Only alphabets and spaces allowed')
   .refine((v) => /^[A-Z]/.test(v), 'Must start with a capital letter');
 
-const requiredEmail = z
+const optionalEmail = z
   .string()
   .trim()
-  .min(1, 'Required')
-  .email('Invalid email')
-  // Stricter than Zod's default email check (prevents "a@b" style inputs).
-  .refine((v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v), 'Invalid email');
+  .optional()
+  .refine(
+    (v) => {
+      const value = (v ?? '').trim();
+      if (!value) return true; // email is optional
+      // Use Zod's email check + a stricter domain requirement.
+      const basicOk = z.string().email().safeParse(value).success;
+      const strictOk = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+      return basicOk && strictOk;
+    },
+    { message: 'Invalid email' },
+  );
 
 export const createUserFormSchema = z.object({
   firstName: requiredNamePart,
   lastName: requiredNamePart,
-  email: requiredEmail,
+  email: optionalEmail,
   role: z.enum(USER_ROLES),
 });
 

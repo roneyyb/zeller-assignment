@@ -31,6 +31,16 @@ describe('createUserFormSchema', () => {
     expect(res.success).toBe(false);
   });
 
+  it('accepts empty email (optional)', () => {
+    const res = createUserFormSchema.safeParse({
+      firstName: 'Ada',
+      lastName: 'Lovelace',
+      email: '',
+      role: 'Admin',
+    });
+    expect(res.success).toBe(true);
+  });
+
   it('accepts valid values', () => {
     const res = createUserFormSchema.safeParse({
       firstName: 'Ada',

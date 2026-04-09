@@ -207,6 +207,9 @@ export default function SearchBarExpandWithButton({
         <AnimatedPressable
           disabled={disabled}
           onPress={openSearch}
+          pointerEvents={open ? 'none' : 'auto'}
+          accessibilityRole="button"
+          accessibilityLabel="Open search"
           style={[
             styles.iconButton,
             { width: collapsedWidth, height },
@@ -219,7 +222,10 @@ export default function SearchBarExpandWithButton({
         </AnimatedPressable>
 
         {/* Input row (only visible when expanding) */}
-        <Animated.View style={[styles.inputRow, inputAnimatedStyle]}>
+        <Animated.View
+          pointerEvents={open ? 'auto' : 'none'}
+          style={[styles.inputRow, inputAnimatedStyle]}
+        >
           <View style={styles.leadingIcon}>
             <FontAwesome name="search" size={24} color={colors.text} />
           </View>
@@ -284,6 +290,9 @@ export default function SearchBarExpandWithButton({
             onPress={closeSearch}
             disabled={disabled}
             hitSlop={10}
+            pointerEvents={open ? 'auto' : 'none'}
+            accessibilityRole="button"
+            accessibilityLabel="Close search"
             style={[styles.closeButton, closeAnimatedStyle]}
           >
             <View style={[styles.chevron, { borderColor: colors.textMuted }]} />

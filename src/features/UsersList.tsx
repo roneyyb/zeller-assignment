@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo } from 'react';
 import {
   ActivityIndicator,
+  Pressable,
   RefreshControl,
   SectionList,
   StyleSheet,
@@ -18,6 +19,9 @@ type UsersListProps = {
   initialSync?: boolean;
   /** Show role label on the right (useful for All tab). */
   showRole?: boolean;
+  onUserPress?: (id: string) => void;
+  /** Change this value to force a reload from DB (e.g. on screen focus). */
+  reloadKey?: number;
 };
 
 type Row = {
@@ -45,9 +49,11 @@ export default function UsersList({
   search = '',
   initialSync = true,
   showRole = false,
+  onUserPress,
+  reloadKey = 0,
 }: UsersListProps) {
   const { colors } = useAppTheme();
-  const { rows, loading, refreshing, error, refresh } = useUsers({
+  const { rows, loading, refreshing, error, refresh, reloadFromDb } = useUsers({
     role: role || null,
     search,
   });
@@ -57,6 +63,12 @@ export default function UsersList({
     refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialSync]);
+
+  useEffect(() => {
+    // When navigating back from Edit/Delete, UsersHome remains mounted.
+    // Reload rows so delete/update is reflected immediately.
+    reloadFromDb();
+  }, [reloadFromDb, reloadKey]);
 
   const sections = useMemo<Section[]>(() => {
     const map = new Map<string, Row[]>();
@@ -129,7 +141,11 @@ export default function UsersList({
         />
       )}
       renderItem={({ item }) => (
-        <View
+        <Pressable
+          testID={`user-row-${item.id}`}
+          accessibilityRole="button"
+          accessibilityLabel={item.name ?? 'User'}
+          onPress={() => onUserPress?.(item.id)}
           style={[
             styles.row,
             { borderBottomWidth: 1, borderColor: colors.border },
@@ -148,7 +164,7 @@ export default function UsersList({
               {displayRole(item.role)}
             </Text>
           ) : null}
-        </View>
+        </Pressable>
       )}
       stickySectionHeadersEnabled={false}
     />

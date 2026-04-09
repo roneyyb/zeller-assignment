@@ -1,22 +1,22 @@
-import { useNavigation } from '@react-navigation/native';
-import React, { useMemo } from 'react';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import TopTabBar from '@/src/components/tab-bar/TabBarTop';
-import { useAppTheme } from '@/src/utils/theme';
-
 import type { RootStackParamList } from '@/src/navigation/AppNavigator';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useAppTheme } from '@/src/utils/theme';
 import { MaterialIcons } from '@expo/vector-icons';
-import { Search } from './Search';
-import UsersList from './UsersList';
-import { useUsersHomeState } from './useUsersHomeState';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+import { Search } from '@/src/features/Search';
+import UsersList from '@/src/features/UsersList';
+import { useUsersHomeState } from '@/src/features/useUsersHomeState';
 
 const TABS = ['All', 'Admin', 'Manager'] as const;
 type Tab = (typeof TABS)[number];
 
-export default function UsersHome() {
+export default function UsersHomeScreen() {
   const { colors } = useAppTheme();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
@@ -29,13 +29,42 @@ export default function UsersHome() {
     clearSearchOnTabChange: true,
   });
 
+  const [reloadKey, setReloadKey] = useState(0);
+  useFocusEffect(
+    useCallback(() => {
+      setReloadKey((k) => k + 1);
+    }, []),
+  );
+
   const pages = useMemo(
     () => ({
-      Admin: <UsersList role="Admin" search={home.search} />,
-      Manager: <UsersList role="Manager" search={home.search} />,
-      All: <UsersList role="" search={home.search} showRole />,
+      Admin: (
+        <UsersList
+          role="Admin"
+          search={home.search}
+          reloadKey={reloadKey}
+          onUserPress={(id) => navigation.navigate('EditUser', { id })}
+        />
+      ),
+      Manager: (
+        <UsersList
+          role="Manager"
+          search={home.search}
+          reloadKey={reloadKey}
+          onUserPress={(id) => navigation.navigate('EditUser', { id })}
+        />
+      ),
+      All: (
+        <UsersList
+          role=""
+          search={home.search}
+          showRole
+          reloadKey={reloadKey}
+          onUserPress={(id) => navigation.navigate('EditUser', { id })}
+        />
+      ),
     }),
-    [home.search],
+    [home.search, navigation, reloadKey],
   );
 
   return (
@@ -110,18 +139,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  plusVert: {
-    position: 'absolute',
-    width: 2,
-    height: 18,
-    backgroundColor: '#ffffff',
-    borderRadius: 1,
-  },
-  plusHorz: {
-    position: 'absolute',
-    width: 18,
-    height: 2,
-    backgroundColor: '#ffffff',
-    borderRadius: 1,
-  },
 });
+
