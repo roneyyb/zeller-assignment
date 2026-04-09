@@ -1,50 +1,92 @@
-# Welcome to your Expo app 👋
+# Zeller React Native Code Challenge
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Offline-first React Native (Expo) app that:
+- Fetches users via AppSync GraphQL `listZellerCustomers`
+- Persists into local **SQLite** for offline usage
+- Displays from SQLite (DB is source of truth)
+- Supports create, edit, delete (local only), role filtering, and name search
 
-## Get started
+## Tech stack
+- **Expo / React Native** (TypeScript)
+- **Apollo Client** for GraphQL
+- **expo-sqlite** for local persistence
+- **react-hook-form + zod** for form validation
+- **Jest + @testing-library/react-native** for tests
 
-1. Install dependencies
+## Environment variables
+This project uses Expo env vars (`EXPO_PUBLIC_*`).
 
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+1. Create a `.env` file:
 
 ```bash
-npm run reset-project
+cp .env.example .env
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. Fill in AppSync values (from `aws-exports.js` you were provided in the challenge):
+- `EXPO_PUBLIC_APPSYNC_GRAPHQL_ENDPOINT`
+- `EXPO_PUBLIC_APPSYNC_API_KEY`
+- `EXPO_PUBLIC_APPSYNC_REGION` (optional)
 
-## Learn more
+> Note: API keys are not secrets in a mobile bundle. Don’t commit real keys.
 
-To learn more about developing your project with Expo, look at the following resources:
+## Install & run (Yarn — evaluator friendly)
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+yarn install
+yarn ios
+# or
+yarn android
+```
 
-## Join the community
+Start Metro only (no emulator boot):
 
-Join our community of developers creating universal apps.
+```bash
+yarn start
+```
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Install & run (Bun — optional)
+
+```bash
+bun install
+bun run ios
+# or
+bun run android
+```
+
+## Tests
+
+```bash
+yarn test
+# or
+bun run test
+```
+
+## Project notes
+
+### Offline-first data flow
+Network is only used to sync; UI reads from SQLite.
+
+- GraphQL fetch: `src/api/users.ts` (`listUsersPage`, `listAllUsers`)
+- Sync service: `src/services/syncUsers.ts`
+- SQLite repo: `src/database/sqlite/usersRepo.ts`
+- UI hook: `src/features/useUsers.ts`
+
+### Create/Edit/Delete
+- Screen: `src/screens/CreateUserScreen.tsx` (handles create + edit routes)
+- Shared form UI/logic: `src/screens/UpsertUserScreenBase.tsx`
+- List → edit navigation: tap a row in `src/features/UsersList.tsx`
+
+### Validation rules
+- First/last name: required, alphabets/spaces only, max 50 chars, must start with a capital letter
+- Email: optional; if provided, must be valid
+
+## Common commands
+
+```bash
+yarn lint
+yarn test
+```
+
+## Troubleshooting
+- If you see “Missing AppSync config…” ensure `.env` has `EXPO_PUBLIC_APPSYNC_GRAPHQL_ENDPOINT` and `EXPO_PUBLIC_APPSYNC_API_KEY`.
+
