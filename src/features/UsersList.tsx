@@ -140,32 +140,43 @@ export default function UsersList({
           }}
         />
       )}
-      renderItem={({ item }) => (
-        <Pressable
-          testID={`user-row-${item.id}`}
-          accessibilityRole="button"
-          accessibilityLabel={item.name ?? 'User'}
-          onPress={() => onUserPress?.(item.id)}
-          style={[
-            styles.row,
-            { borderBottomWidth: 1, borderColor: colors.border },
-          ]}
-        >
-          <View style={[styles.avatar, { backgroundColor: '#E8F2FB' }]}>
-            <Text style={{ color: colors.primary, fontWeight: '700' }}>
-              {initialLetter(item.name)}
+      renderItem={({ item }) => {
+        const role = displayRole(item.role);
+        return (
+          <Pressable
+            testID={`user-row-${item.id}`}
+            accessibilityRole="button"
+            accessibilityLabel={item.name ?? 'User'}
+            onPress={() => onUserPress?.(item.id)}
+            style={[
+              styles.row,
+              { borderBottomWidth: 1, borderColor: colors.border },
+            ]}
+          >
+            <View style={[styles.avatar, { backgroundColor: '#E8F2FB' }]}>
+              <Text style={{ color: colors.primary, fontWeight: '700' }}>
+                {initialLetter(item.name)}
+              </Text>
+            </View>
+            <Text
+              style={[styles.name, { color: colors.text }]}
+              numberOfLines={1}
+            >
+              {item.name ?? 'Unnamed'}
             </Text>
-          </View>
-          <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>
-            {item.name ?? 'Unnamed'}
-          </Text>
-          {showRole ? (
-            <Text style={[styles.role, { color: colors.textMuted }]}>
-              {displayRole(item.role)}
-            </Text>
-          ) : null}
-        </Pressable>
-      )}
+            {showRole ? (
+              <Text
+                style={[
+                  styles.role,
+                  { color: colors.textMuted, paddingRight: 5 },
+                ]}
+              >
+                {role}
+              </Text>
+            ) : null}
+          </Pressable>
+        );
+      }}
       stickySectionHeadersEnabled={false}
     />
   );
