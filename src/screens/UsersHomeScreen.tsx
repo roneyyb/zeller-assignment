@@ -84,12 +84,15 @@ export default function UsersHomeScreen() {
         renderPage={(option) => pages[option as Tab] ?? pages.All}
         hideHeaderLeft={!home.showTabs}
         pagerStyle={{ marginTop: 10 }}
+        containerStyle={{ paddingTop: 10 }}
+        headerHeight={55}
         headerRight={
           <Search
             value={home.search}
             onChangeText={home.setSearch}
             onOpenChange={home.onSearchOpenChange}
-            containerWidth={home.showTabs ? 44 : '100%'}
+            containerWidth={home.showTabs ? 60 : '100%'}
+            height={55}
           />
         }
         segmented={{
@@ -102,11 +105,11 @@ export default function UsersHomeScreen() {
           activeTextColor: colors.primary,
           inactiveTextColor: colors.textSecondary,
           borderRadius: 100,
-          height: 50,
+          height: 60,
           indicatorBorderRadius: 100,
           paddingVertical: 0,
           optionStyle: {
-            paddingHorizontal: '15%',
+            paddingHorizontal: '12%',
           },
           indicatorStyle: {
             backgroundColor: colors.primary + '1A',

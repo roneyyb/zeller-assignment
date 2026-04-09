@@ -1,5 +1,5 @@
 import { useAppTheme } from '@/src/utils/theme';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import React, {
   useCallback,
   useEffect,
@@ -218,7 +218,7 @@ export default function SearchBarExpandWithButton({
           ]}
           hitSlop={10}
         >
-          <FontAwesome name="search" size={24} color={colors.text} />
+          <MaterialIcons name="search" size={30} color={colors.primary} />
         </AnimatedPressable>
 
         {/* Input row (only visible when expanding) */}
@@ -227,7 +227,7 @@ export default function SearchBarExpandWithButton({
           style={[styles.inputRow, inputAnimatedStyle]}
         >
           <View style={styles.leadingIcon}>
-            <FontAwesome name="search" size={24} color={colors.text} />
+            <MaterialIcons name="search" size={30} color={colors.text} />
           </View>
 
           <TextInput
@@ -266,24 +266,7 @@ export default function SearchBarExpandWithButton({
               },
             ]}
           >
-            <View
-              style={[
-                styles.xLine,
-                {
-                  backgroundColor: colors.textMuted,
-                  transform: [{ rotate: '45deg' }],
-                },
-              ]}
-            />
-            <View
-              style={[
-                styles.xLine,
-                {
-                  backgroundColor: colors.textMuted,
-                  transform: [{ rotate: '-45deg' }],
-                },
-              ]}
-            />
+            <MaterialIcons name="close" size={24} color={colors.text} />
           </Pressable>
 
           <AnimatedPressable
@@ -295,7 +278,7 @@ export default function SearchBarExpandWithButton({
             accessibilityLabel="Close search"
             style={[styles.closeButton, closeAnimatedStyle]}
           >
-            <View style={[styles.chevron, { borderColor: colors.textMuted }]} />
+            <MaterialIcons name="chevron-right" size={30} color={colors.text} />
           </AnimatedPressable>
         </Animated.View>
       </Animated.View>

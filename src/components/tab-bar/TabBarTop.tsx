@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { StyleProp, View, ViewStyle } from 'react-native';
 import PagerView, {
   PagerViewOnPageSelectedEvent,
@@ -44,6 +50,9 @@ export type TopTabBarProps = {
   /** Pager props. */
   pagerStyle?: StyleProp<ViewStyle>;
   scrollEnabled?: boolean;
+
+  /** Header styles. */
+  headerHeight?: number;
 };
 
 /**
@@ -64,6 +73,7 @@ export default function TopTabBar({
   segmented,
   pagerStyle,
   scrollEnabled = true,
+  headerHeight = 50,
 }: TopTabBarProps) {
   const pagerRef = useRef<PagerView>(null);
 
@@ -130,27 +140,36 @@ export default function TopTabBar({
           justifyContent: 'space-between',
           alignItems: 'center',
           paddingHorizontal: 16,
+          height: headerHeight,
         }}
       >
-        {hideHeaderLeft ? null : (
-          <View style={{ flex: 1 }}>
-            <SegmentedControl
-              options={options}
-              selectedOption={options[selectedIndex] ?? selectedOption}
-              onOptionPress={handleOptionPress}
-              {...segmented}
-            />
-          </View>
-        )}
+        <View style={{ flex: 0.6, opacity: hideHeaderLeft ? 0 : 1 }}>
+          <SegmentedControl
+            options={options}
+            selectedOption={options[selectedIndex] ?? selectedOption}
+            onOptionPress={handleOptionPress}
+            {...segmented}
+          />
+        </View>
 
         <View
           style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'flex-end',
+            position: 'absolute',
+            right: 16,
+            left: 16,
+            top: 0,
+            bottom: 0,
           }}
         >
-          {headerRight}
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'flex-end',
+            }}
+          >
+            {headerRight}
+          </View>
         </View>
       </View>
       <PagerView
