@@ -1,8 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import SegmentedControl from '@/src/components/segmented-control/SegmentedControl';
+import FormTextField from '@/src/components/form/FormTextField';
 import { createUser } from '@/src/database/sqlite/usersRepo';
 import {
   buildFullName,
@@ -106,95 +107,55 @@ export function CreateUserScreenBase({ deps }: { deps: CreateUserDeps }) {
 
         <Text style={[styles.title, { color: colors.text }]}>New User</Text>
 
-        <View style={styles.field}>
-          <Controller
-            control={control}
-            name="firstName"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                value={value}
-                onChangeText={(t) => onChange(capitalizeFirstLetter(t))}
-                onBlur={onBlur}
-                placeholder="First Name"
-                placeholderTextColor={colors.textMuted}
-                autoCapitalize="words"
-                style={[
-                  styles.input,
-                  {
-                    color: colors.text,
-                    borderColor: errors.firstName ? colors.error : colors.border,
-                  },
-                ]}
-              />
-            )}
-          />
-          {errors.firstName?.message ? (
-            <Text style={{ color: colors.error, marginTop: 6 }}>
-              {errors.firstName.message}
-            </Text>
-          ) : null}
-        </View>
+        <Controller
+          control={control}
+          name="firstName"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <FormTextField
+              value={value}
+              onChangeText={(t) => onChange(capitalizeFirstLetter(t))}
+              onBlur={onBlur}
+              placeholder="First Name"
+              errorMessage={errors.firstName?.message}
+              inputProps={{ autoCapitalize: 'words' }}
+            />
+          )}
+        />
 
-        <View style={styles.field}>
-          <Controller
-            control={control}
-            name="lastName"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                value={value}
-                onChangeText={(t) => onChange(capitalizeFirstLetter(t))}
-                onBlur={onBlur}
-                placeholder="Last Name"
-                placeholderTextColor={colors.textMuted}
-                autoCapitalize="words"
-                style={[
-                  styles.input,
-                  {
-                    color: colors.text,
-                    borderColor: errors.lastName ? colors.error : colors.border,
-                  },
-                ]}
-              />
-            )}
-          />
-          {errors.lastName?.message ? (
-            <Text style={{ color: colors.error, marginTop: 6 }}>
-              {errors.lastName.message}
-            </Text>
-          ) : null}
-        </View>
+        <Controller
+          control={control}
+          name="lastName"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <FormTextField
+              value={value}
+              onChangeText={(t) => onChange(capitalizeFirstLetter(t))}
+              onBlur={onBlur}
+              placeholder="Last Name"
+              errorMessage={errors.lastName?.message}
+              inputProps={{ autoCapitalize: 'words' }}
+            />
+          )}
+        />
 
-        <View style={styles.field}>
-          <Controller
-            control={control}
-            name="email"
-            render={({ field: { onChange, onBlur, value } }) => (
-              <TextInput
-                value={value}
-                onChangeText={(t) => onChange(t.trimStart())}
-                onBlur={onBlur}
-                placeholder="Email"
-                placeholderTextColor={colors.textMuted}
-                autoCapitalize="none"
-                keyboardType="email-address"
-                style={[
-                  styles.input,
-                  {
-                    color: colors.text,
-                    borderColor: errors.email ? colors.error : colors.border,
-                  },
-                ]}
-              />
-            )}
-          />
-          {errors.email?.message ? (
-            <Text style={{ color: colors.error, marginTop: 6 }}>
-              {errors.email.message}
-            </Text>
-          ) : null}
-        </View>
+        <Controller
+          control={control}
+          name="email"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <FormTextField
+              value={value}
+              onChangeText={(t) => onChange(t.trimStart())}
+              onBlur={onBlur}
+              placeholder="Email"
+              errorMessage={errors.email?.message}
+              inputProps={{
+                autoCapitalize: 'none',
+                keyboardType: 'email-address',
+              }}
+            />
+          )}
+        />
 
-        <View style={styles.field}>
+        <View style={{ marginTop: 22 }}>
           <Text
             style={[
               styles.label,
@@ -294,14 +255,7 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   title: { fontSize: 28, fontWeight: '700', marginTop: 8 },
-  field: { marginTop: 22 },
   label: { fontSize: 14, marginBottom: 8 },
-  input: {
-    height: 50,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    fontSize: 18,
-    paddingVertical: 6,
-  },
   button: {
     marginTop: 'auto',
     height: 56,

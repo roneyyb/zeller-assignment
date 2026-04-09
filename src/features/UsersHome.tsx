@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useMemo } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import TopTabBar from '@/src/components/tab-bar/TabBarTop';
@@ -8,6 +8,7 @@ import { useAppTheme } from '@/src/utils/theme';
 
 import type { RootStackParamList } from '@/src/navigation/AppNavigator';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { MaterialIcons } from '@expo/vector-icons';
 import { Search } from './Search';
 import UsersList from './UsersList';
 import { useUsersHomeState } from './useUsersHomeState';
@@ -92,8 +93,7 @@ export default function UsersHome() {
           },
         ]}
       >
-        <View style={styles.plusVert} />
-        <View style={styles.plusHorz} />
+        <MaterialIcons name="add" size={24} color="white" />
       </Pressable>
     </SafeAreaView>
   );

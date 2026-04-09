@@ -1,3 +1,4 @@
+/* eslint-disable import/first -- Jest hoists jest.mock; imports must follow the mock. */
 jest.mock('./apolloClient', () => ({
   getApolloClient: jest.fn(),
 }));
