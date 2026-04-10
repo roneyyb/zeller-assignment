@@ -46,7 +46,7 @@ export default function UsersHomeScreen() {
       Admin: (
         <UsersList
           role="Admin"
-          search={home.search}
+          search=""
           reloadKey={reloadKey}
           onUserPress={(id) => navigation.navigate('EditUser', { id })}
         />
@@ -54,7 +54,7 @@ export default function UsersHomeScreen() {
       Manager: (
         <UsersList
           role="Manager"
-          search={home.search}
+          search=""
           reloadKey={reloadKey}
           onUserPress={(id) => navigation.navigate('EditUser', { id })}
         />

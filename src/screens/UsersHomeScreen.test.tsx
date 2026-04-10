@@ -127,6 +127,16 @@ describe('UsersHomeScreen', () => {
     expect(screen.getByTestId('hide-header-left').props.children).toBe('true');
   });
 
+  it('applies search only to the All list', () => {
+    renderWithProviders(<UsersHomeScreen />);
+
+    fireEvent.press(screen.getByTestId('search-change'));
+    expect(screen.getByTestId('users-list-role-all').props.children).toBe('Ada');
+
+    fireEvent.press(screen.getByTestId('tab-Admin'));
+    expect(screen.getByTestId('users-list-role-Admin').props.children).toBe('');
+  });
+
   it('reloads lists on second focus (returning to screen)', () => {
     renderWithProviders(<UsersHomeScreen />);
 
