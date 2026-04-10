@@ -20,7 +20,6 @@ import {
 import Animated, {
   Easing,
   interpolate,
-  runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
@@ -46,7 +45,7 @@ export type SearchBarExpandWithButtonProps = {
   /** Behavior */
   defaultOpen?: boolean;
   autoFocus?: boolean;
-  closeOnBlur?: boolean;
+
   disabled?: boolean;
 
   /** Sizes */
@@ -85,7 +84,7 @@ export default function SearchBarExpandWithButton({
   buttonStyle,
   defaultOpen = false,
   autoFocus = true,
-  closeOnBlur = true,
+
   disabled = false,
   height = 40,
   collapsedWidth = 40,
@@ -238,14 +237,6 @@ export default function SearchBarExpandWithButton({
             placeholderTextColor={colors.textMuted}
             returnKeyType="search"
             onSubmitEditing={handleSubmitEditing}
-            onBlur={() => {
-              if (closeOnBlur) {
-                // Delay slightly so pressing the clear/close buttons still works.
-                progress.value = withTiming(1, { duration: 1 }, () => {
-                  runOnJS(closeSearch)();
-                });
-              }
-            }}
             style={[styles.input, { color: colors.text }, inputStyle]}
             {...inputProps}
           />
